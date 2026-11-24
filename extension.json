@@ -1,0 +1,58 @@
+{
+    "name": "laveroadmin/ckeditor",
+    "title": {
+        "en": "CKEditor 5",
+        "ru": "Редактор CKEditor 5"
+    },
+    "description": {
+        "en": "Rich WYSIWYG text editor integration for Model-Form textarea fields.",
+        "ru": "Интеграция визуального WYSIWYG редактора CKEditor 5 в поля Model-Form."
+    },
+    "category": "content",
+    "icon": "icon-pencil-alt",
+    "version": "1.0.0",
+    "author": {
+        "name": "Aleksandr Kireev",
+        "email": "hello@bespredel.name",
+        "url": "https://bespredel.name"
+    },
+    "github": "https://github.com/LaveroAdmin/ckeditor",
+    "setup": {
+        "commands": [
+            {
+                "cmd": "php artisan admin:import ckeditor",
+                "desc": {
+                    "en": "Publish CKEditor 5 JavaScript and CSS assets",
+                    "ru": "Публикация JS/CSS бандла редактора CKEditor 5"
+                }
+            }
+        ],
+        "config": {
+            "file": "config/admin.php",
+            "code": "'ckeditor' => [\n    'enable' => true,\n],"
+        },
+        "requirements": {
+            "en": [
+                "PHP >= 8.1"
+            ],
+            "ru": [
+                "PHP >= 8.1"
+            ]
+        },
+        "notes": {
+            "en": [
+                "Use in your form: $form->ckeditor('content')->options(['height' => 400]);"
+            ],
+            "ru": [
+                "Используйте в форме: $form->ckeditor('content')->options(['height' => 400]);"
+            ]
+        }
+    },
+    "key": "ckeditor",
+    "compatibility": {
+        "php": ">=8.1",
+        "laravel": "^10.0 || ^11.0 || ^12.0 || ^13.0",
+        "admin": "^1.0",
+        "extensions": []
+    }
+}
