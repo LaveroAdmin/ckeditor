@@ -225,6 +225,9 @@ JS;
         if (!cfg.language) {
             cfg.language = '{$langCode}';
         }
+        if (!cfg.ui) {
+            cfg.ui = { viewportOffset: { top: 58 } };
+        }
         if (!cfg.toolbar) {
             cfg.toolbar = {
                 items: [

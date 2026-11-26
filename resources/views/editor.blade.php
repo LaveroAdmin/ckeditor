@@ -42,6 +42,13 @@
             .lavero-ckeditor-wrap .ck-editor__editable_inline {
                 min-height: 300px;
             }
+            .lavero-ckeditor-wrap .ck.ck-sticky-panel .ck-sticky-panel__content_sticky {
+                top: 58px !important;
+                z-index: 1030 !important;
+            }
+            .lavero-ckeditor-wrap.lavero-ckeditor-fullscreen .ck.ck-sticky-panel .ck-sticky-panel__content_sticky {
+                top: 0 !important;
+            }
             .lavero-ckeditor-wrap.lavero-ckeditor-fullscreen .ck-editor__editable_inline {
                 min-height: calc(100vh - 140px);
             }
