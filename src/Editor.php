@@ -247,7 +247,6 @@ JS;
         if (!cfg.removePlugins) {
             cfg.removePlugins = [
                 'AIAssistant', 'CKBox', 'CKFinder', 'EasyImage',
-                'ImageInsert', 'ImageInsertUI', 'ImageInsertViaUrl',
                 'RealTimeCollaborativeComments', 'RealTimeCollaborativeTrackChanges',
                 'RealTimeCollaborativeRevisionHistory', 'PresenceList', 'Comments',
                 'TrackChanges', 'TrackChangesData', 'RevisionHistory', 'Pagination',
@@ -256,6 +255,13 @@ JS;
                 'PasteFromOfficeEnhanced', 'CaseChange', 'MultiLevelList',
                 'ExportPdf', 'ExportWord', 'ImportWord'
             ];
+        }
+        if (!cfg.image) {
+            cfg.image = {
+                insert: {
+                    integrations: ['url']
+                }
+            };
         }
         if (!cfg.htmlSupport) {
             cfg.htmlSupport = { allow: [{ name: /.*/, attributes: true, classes: true, styles: true }] };
