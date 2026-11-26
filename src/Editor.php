@@ -238,7 +238,7 @@ JS;
                     'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', 'subscript', 'superscript', '|',
                     'alignment', '|',
                     'bulletedList', 'numberedList', 'outdent', 'indent', '|',
-                    'link', 'insertImage', 'mediaEmbed', 'insertTable', 'blockQuote', 'codeBlock', 'horizontalLine', 'specialCharacters', '|',
+                    'link', 'mediaEmbed', 'insertTable', 'blockQuote', 'codeBlock', 'horizontalLine', 'specialCharacters', '|',
                     'htmlEmbed', 'sourceEditing'
                 ],
                 shouldNotGroupWhenFull: true
@@ -247,6 +247,7 @@ JS;
         if (!cfg.removePlugins) {
             cfg.removePlugins = [
                 'AIAssistant', 'CKBox', 'CKFinder', 'EasyImage',
+                'ImageInsert', 'ImageInsertUI', 'ImageInsertViaUrl',
                 'RealTimeCollaborativeComments', 'RealTimeCollaborativeTrackChanges',
                 'RealTimeCollaborativeRevisionHistory', 'PresenceList', 'Comments',
                 'TrackChanges', 'TrackChangesData', 'RevisionHistory', 'Pagination',
