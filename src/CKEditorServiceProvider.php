@@ -34,7 +34,7 @@ class CKEditorServiceProvider extends ServiceProvider
             $version = (int) CKEditor::config('version', 5);
             $defaultJs = $version === 4
                 ? 'vendor/lavero-admin-ckeditor/ckeditor.js'
-                : 'https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js';
+                : 'https://cdn.ckeditor.com/ckeditor5/41.4.2/super-build/ckeditor.js';
             $jsPath = CKEditor::config('js_path') ?: $defaultJs;
             Admin::js($jsPath, false); // prevent minifying
 

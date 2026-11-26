@@ -210,13 +210,50 @@ JS;
 (function() {
     window.laveroCk5Instances = window.laveroCk5Instances || {};
     var el = document.getElementById('{$this->id}');
-    if (!el || typeof ClassicEditor === 'undefined') return;
+    var wrapEl = document.getElementById('{$this->id}_wrap');
+    var mediaBtn = document.getElementById('{$this->id}_media_btn');
+    var fsBtn = document.getElementById('{$this->id}_fullscreen_btn');
+    var EditorClass = (window.CKEDITOR && window.CKEDITOR.ClassicEditor) ? window.CKEDITOR.ClassicEditor : window.ClassicEditor;
+    if (!el || !EditorClass) return;
 
     var cfg = {$configJson};
     delete cfg.filebrowserBrowseUrl;
     delete cfg.filebrowserImageBrowseUrl;
 
-    ClassicEditor.create(el, cfg).then(function(editor) {
+    if (window.CKEDITOR && window.CKEDITOR.ClassicEditor && EditorClass === window.CKEDITOR.ClassicEditor) {
+        if (!cfg.toolbar) {
+            cfg.toolbar = {
+                items: [
+                    'sourceEditing', '|',
+                    'undo', 'redo', 'findAndReplace', '|',
+                    'heading', '|',
+                    'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', '|',
+                    'bold', 'italic', 'underline', 'strikethrough', 'subscript', 'superscript', 'code', 'removeFormat', '|',
+                    'alignment', '|',
+                    'bulletedList', 'numberedList', 'outdent', 'indent', '|',
+                    'link', 'insertImage', 'mediaEmbed', 'insertTable', 'blockQuote', 'codeBlock', 'htmlEmbed', 'horizontalLine', 'specialCharacters'
+                ],
+                shouldNotGroupWhenFull: true
+            };
+        }
+        if (!cfg.removePlugins) {
+            cfg.removePlugins = [
+                'AIAssistant', 'CKBox', 'CKFinder', 'EasyImage',
+                'RealTimeCollaborativeComments', 'RealTimeCollaborativeTrackChanges',
+                'RealTimeCollaborativeRevisionHistory', 'PresenceList', 'Comments',
+                'TrackChanges', 'TrackChangesData', 'RevisionHistory', 'Pagination',
+                'WProofreader', 'MathType', 'SlashCommand', 'Template',
+                'DocumentOutline', 'FormatPainter', 'TableOfContents',
+                'PasteFromOfficeEnhanced', 'CaseChange', 'MultiLevelList',
+                'ExportPdf', 'ExportWord', 'ImportWord'
+            ];
+        }
+        if (!cfg.htmlSupport) {
+            cfg.htmlSupport = { allow: [{ name: /.*/, attributes: true, classes: true, styles: true }] };
+        }
+    }
+
+    EditorClass.create(el, cfg).then(function(editor) {
         window.laveroCk5Instances['{$this->id}'] = editor;
         editor.model.document.on('change:data', function() {
             el.value = editor.getData();
@@ -224,6 +261,22 @@ JS;
     }).catch(function(err) {
         console.error('CKEditor 5 init error:', err);
     });
+
+    if (mediaBtn) {
+        mediaBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.open('{$mediaUrl}', 'MediaManager', 'width=960,height=640');
+        });
+    }
+
+    if (fsBtn && wrapEl) {
+        fsBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            var isFs = wrapEl.classList.toggle('lavero-ckeditor-fullscreen');
+            fsBtn.classList.toggle('btn-primary', isFs);
+            fsBtn.classList.toggle('btn-outline-secondary', !isFs);
+        });
+    }
 
     window.{$this->id}_selectFile = function(url, file_name) {
         var editor = window.laveroCk5Instances['{$this->id}'];
