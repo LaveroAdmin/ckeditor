@@ -164,6 +164,7 @@ class Editor extends Textarea
         $configJson = json_encode($mergedConfig, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         $version = (int) CKEditor::config('version', 5);
         $mediaUrl = admin_url('media') . '?select=true&close=true&fn=window.opener.' . $this->id . '_selectFile';
+        $langCode = explode('-', strtolower(str_replace('_', '-', app()->getLocale())))[0] ?: 'en';
 
         if ($version === 4) {
             $this->script = <<<JS
@@ -221,17 +222,21 @@ JS;
     delete cfg.filebrowserImageBrowseUrl;
 
     if (window.CKEDITOR && window.CKEDITOR.ClassicEditor && EditorClass === window.CKEDITOR.ClassicEditor) {
+        if (!cfg.language) {
+            cfg.language = '{$langCode}';
+        }
         if (!cfg.toolbar) {
             cfg.toolbar = {
                 items: [
-                    'sourceEditing', '|',
-                    'undo', 'redo', 'findAndReplace', '|',
+                    'undo', 'redo', '|',
+                    'findAndReplace', '|',
                     'heading', '|',
-                    'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', '|',
-                    'bold', 'italic', 'underline', 'strikethrough', 'subscript', 'superscript', 'code', 'removeFormat', '|',
+                    'bold', 'italic', 'underline', 'strikethrough', 'code', 'removeFormat', '|',
+                    'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', 'subscript', 'superscript', '|',
                     'alignment', '|',
                     'bulletedList', 'numberedList', 'outdent', 'indent', '|',
-                    'link', 'insertImage', 'mediaEmbed', 'insertTable', 'blockQuote', 'codeBlock', 'htmlEmbed', 'horizontalLine', 'specialCharacters'
+                    'link', 'insertImage', 'mediaEmbed', 'insertTable', 'blockQuote', 'codeBlock', 'horizontalLine', 'specialCharacters', '|',
+                    'htmlEmbed', 'sourceEditing'
                 ],
                 shouldNotGroupWhenFull: true
             };
@@ -275,6 +280,10 @@ JS;
             var isFs = wrapEl.classList.toggle('lavero-ckeditor-fullscreen');
             fsBtn.classList.toggle('btn-primary', isFs);
             fsBtn.classList.toggle('btn-outline-secondary', !isFs);
+            var span = fsBtn.querySelector('span');
+            if (span) {
+                span.textContent = isFs ? (fsBtn.dataset.labelExit || 'Exit') : (fsBtn.dataset.labelEnter || 'Fullscreen');
+            }
         });
     }
 
