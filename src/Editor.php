@@ -162,8 +162,11 @@ class Editor extends Textarea
         // 5. Final config merges global config with field-level options (field options take precedence)
         $mergedConfig = array_merge($globalConfig, $this->options);
         $configJson = json_encode($mergedConfig, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        $version = (int) CKEditor::config('version', 5);
+        $mediaUrl = admin_url('media') . '?select=true&close=true&fn=window.opener.' . $this->id . '_selectFile';
 
-        $this->script = <<<JS
+        if ($version === 4) {
+            $this->script = <<<JS
 function {$this->id}_selectFile(url, file_name) {
     if (typeof CKEDITOR === 'undefined') return;
     var dialog = CKEDITOR.dialog.getCurrent();
@@ -178,7 +181,6 @@ function {$this->id}_selectFile(url, file_name) {
             linkDisplayText.setValue(file_name);
         }
     } else {
-        // dialogName == image
         dialog.selectPage('info');
         var txtUrl = dialog.getContentElement('info', 'txtUrl');
         if (txtUrl) txtUrl.setValue(url);
@@ -188,7 +190,7 @@ function {$this->id}_selectFile(url, file_name) {
 }
 window.{$this->id}_selectFile = {$this->id}_selectFile;
 
-var editor = CKEDITOR.replace('{$this->id}', {$configJson});
+CKEDITOR.replace('{$this->id}', {$configJson});
 
 if (typeof window.CKupdate === 'undefined') {
     window.CKupdate = function() {
@@ -203,6 +205,57 @@ if (typeof window.CKupdate === 'undefined') {
     }
 }
 JS;
+        } else {
+            $this->script = <<<JS
+(function() {
+    window.laveroCk5Instances = window.laveroCk5Instances || {};
+    var el = document.getElementById('{$this->id}');
+    if (!el || typeof ClassicEditor === 'undefined') return;
+
+    var cfg = {$configJson};
+    delete cfg.filebrowserBrowseUrl;
+    delete cfg.filebrowserImageBrowseUrl;
+
+    ClassicEditor.create(el, cfg).then(function(editor) {
+        window.laveroCk5Instances['{$this->id}'] = editor;
+        editor.model.document.on('change:data', function() {
+            el.value = editor.getData();
+        });
+    }).catch(function(err) {
+        console.error('CKEditor 5 init error:', err);
+    });
+
+    window.{$this->id}_selectFile = function(url, file_name) {
+        var editor = window.laveroCk5Instances['{$this->id}'];
+        if (!editor) return;
+        editor.model.change(function(writer) {
+            var isImg = /\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i.test(url);
+            if (isImg) {
+                var imageElement = writer.createElement('imageBlock', { src: url, alt: file_name || '' });
+                editor.model.insertContent(imageElement, editor.model.document.selection);
+            } else {
+                var text = writer.createText(file_name || url, { linkHref: url });
+                editor.model.insertContent(text, editor.model.document.selection);
+            }
+        });
+    };
+
+    if (!window._laveroCk5Bound) {
+        window._laveroCk5Bound = true;
+        if (window.admin && window.admin.form) {
+            admin.form.addSaveCallback(function() {
+                Object.keys(window.laveroCk5Instances || {}).forEach(function(id) {
+                    var target = document.getElementById(id);
+                    if (target && window.laveroCk5Instances[id]) {
+                        target.value = window.laveroCk5Instances[id].getData();
+                    }
+                });
+            });
+        }
+    }
+})();
+JS;
+        }
 
         return parent::render();
     }
