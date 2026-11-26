@@ -163,7 +163,7 @@ class Editor extends Textarea
         $mergedConfig = array_merge($globalConfig, $this->options);
         $configJson = json_encode($mergedConfig, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         $version = (int) CKEditor::config('version', 5);
-        $mediaUrl = admin_url('media') . '?select=true&close=true&fn=window.opener.' . $this->id . '_selectFile';
+        $mediaUrl = admin_url('media') . '?select=true&close=true&fn=window.parent.' . $this->id . '_selectFile';
         $langCode = explode('-', strtolower(str_replace('_', '-', app()->getLocale())))[0] ?: 'en';
 
         if ($version === 4) {
@@ -277,10 +277,38 @@ JS;
         console.error('CKEditor 5 init error:', err);
     });
 
+    function openMediaModal() {
+        var modalId = '{$this->id}_media_modal';
+        var modalEl = document.getElementById(modalId);
+        if (!modalEl) {
+            modalEl = document.createElement('div');
+            modalEl.id = modalId;
+            modalEl.className = 'modal fade';
+            modalEl.tabIndex = -1;
+            modalEl.style.zIndex = '2065';
+            modalEl.innerHTML =
+                '<div class="modal-dialog modal-xl modal-dialog-centered">' +
+                    '<div class="modal-content border-0 shadow-lg overflow-hidden" style="border-radius:14px;">' +
+                        '<div class="modal-header py-2 px-3 border-0" style="background:#0f172a;color:#fff;border-bottom:2px solid #bef264 !important;">' +
+                            '<h6 class="modal-title mb-0"><i class="icon-image me-2" style="color:#bef264;"></i>Media Manager</h6>' +
+                            '<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>' +
+                        '</div>' +
+                        '<div class="modal-body p-0" style="height:75vh;">' +
+                            '<iframe src="{$mediaUrl}" style="width:100%;height:100%;border:0;display:block;"></iframe>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+            document.body.appendChild(modalEl);
+        }
+        if (window.bootstrap && bootstrap.Modal) {
+            bootstrap.Modal.getOrCreateInstance(modalEl).show();
+        }
+    }
+
     if (mediaBtn) {
         mediaBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            window.open('{$mediaUrl}', 'MediaManager', 'width=960,height=640');
+            openMediaModal();
         });
     }
 
@@ -298,6 +326,11 @@ JS;
     }
 
     window.{$this->id}_selectFile = function(url, file_name) {
+        var modalEl = document.getElementById('{$this->id}_media_modal');
+        if (modalEl && window.bootstrap && bootstrap.Modal) {
+            var inst = bootstrap.Modal.getInstance(modalEl);
+            if (inst) inst.hide();
+        }
         var editor = window.laveroCk5Instances['{$this->id}'];
         if (!editor) return;
         editor.model.change(function(writer) {
